@@ -17,4 +17,10 @@ public class ExchangeApiResponseDto {
         private String krw;
     }
 
+    @Data
+    public static class convertExchange{
+        private String usd;
+        private String krw;
+        private String timeLastUpdateUtc;
+    }
 }

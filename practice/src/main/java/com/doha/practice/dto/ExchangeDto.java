@@ -8,5 +8,5 @@ import java.time.LocalDateTime;
 public class ExchangeDto {
     private String usd;
     private String krw;
-    private LocalDateTime timeLastUpdateUtc;
+    private String timeLastUpdateUtc;
 }
