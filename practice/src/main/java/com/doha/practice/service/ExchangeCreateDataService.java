@@ -21,7 +21,7 @@ public class ExchangeCreateDataService implements ApiService {
     private final ExchangeRepository exchangeRepository;
 
     @Override
-    public Mono<Object> perform(Object requestDto, Mono<Object> responseDto) {
+    public Mono<?> perform(Object requestDto) {
         Mono<ExchangeApiResponseDto> exchangeApiResponseDto = exchangeWebClient.streamingExchangeRates();
         return exchangeApiResponseDto.flatMap(data -> createExchangeRate(conversionService.convert(data, ExchangeRate.class)));
     }

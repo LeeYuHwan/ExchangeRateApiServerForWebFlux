@@ -16,14 +16,14 @@ public class ExchangeDataController {
 
     private final ApiServiceProvider apiServiceProvider;
 
-    @GetMapping
-    public Mono<Object> createExchangeRate(){
-        return apiServiceProvider.executeApi("exchange.create-data.v1", null, null);
+    @GetMapping("/web-client")
+    public Mono<?> createExchangeRate(){
+        return apiServiceProvider.executeApi("exchange.create-data.v1", null);
     }
 
     @GetMapping("/data")
-    public Mono<Object> getDataExchangeRate(){
-        return apiServiceProvider.executeApi("exchange.get-data.v1", null, null);
+    public Mono<?> getDataExchangeRate(){
+        return apiServiceProvider.executeApi("exchange.get-data.v1", null);
     }
 
 }

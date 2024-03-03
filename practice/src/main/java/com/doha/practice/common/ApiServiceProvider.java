@@ -11,16 +11,16 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ApiServiceProvider {
 
-    public Mono<Object> executeApi(String apiId, Object requestDto, Mono<Object> responseDto){
+    public Mono<?> executeApi(String apiId, Object requestDto){
 
         log.info("API REQUEST :: " + apiId);
 
         ApiService execute = (ApiService) BeanUtils.getBean(apiId);
-        responseDto = execute.perform(requestDto, responseDto);
+        Mono<?> response = execute.perform(requestDto);
 
-        log.info("API PROCESSED COMPLETE : RESPONSE DTO :: {}", responseDto);
+        log.info("API PROCESSED COMPLETE : RESPONSE DTO :: {}", response);
 
-        return responseDto;
+        return response;
 
     }
 

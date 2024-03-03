@@ -8,4 +8,5 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface ExchangeRepository extends ReactiveCrudRepository<ExchangeRate, Long> {
     Mono<ExchangeRate> findByExchangeId(long exchangeId);
+    Mono<ExchangeRate> findFirstByOrderByCreateTimeDesc();
 }

@@ -4,6 +4,6 @@ import com.doha.practice.domain.ExchangeRate;
 import reactor.core.publisher.Mono;
 
 public interface ApiService {
-    public Mono<Object> perform(Object requestDto, Mono<Object> responseDto);
+    public Mono<?> perform(Object requestDto);
 }
 

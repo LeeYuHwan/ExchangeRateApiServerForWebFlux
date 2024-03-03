@@ -8,6 +8,8 @@ public class ExchangeDomainToExchangeDtoConverter implements Converter<ExchangeR
     @Override
     public ExchangeDto convert(ExchangeRate source) {
         return ExchangeDto.builder()
+                .resultCode(0000)
+                .resultMsg("success")
                 .usd(source.getUsd())
                 .krw(source.getKrw())
                 .timeLastUpdateUtc(source.getTimeLastUpdateUtc())
