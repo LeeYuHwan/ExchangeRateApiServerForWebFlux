@@ -13,8 +13,8 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service("exchange.create-data.v1")
-public class ExchangeCreateDataService implements ApiService {
+@Service("exchange.web-client.v1")
+public class ExchangeWebClientService implements ApiService {
 
     private final ExchangeWebClient exchangeWebClient;
     private final DefaultConversionService conversionService;

@@ -14,8 +14,8 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service("exchange.get-data.v1")
-public class ExchangeGetDataService implements ApiService {
+@Service("exchange.data.v1")
+public class ExchangeDataService implements ApiService {
 
     private final ExchangeRepository exchangeRepository;
     private final DefaultConversionService conversionService;
