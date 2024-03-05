@@ -13,3 +13,13 @@ logging:
 exchange:
     url: https://open.er-api.com
     api: /v6/latest
+
+security:
+  no-auth-list: /api/v1/exchange/data
+
+jwt:
+  expire-minute: 60
+  secret-key: doha123
+  password: 12345
+
+

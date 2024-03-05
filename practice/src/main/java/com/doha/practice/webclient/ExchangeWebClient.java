@@ -4,6 +4,7 @@ import com.doha.practice.domain.ExchangeRate;
 import com.doha.practice.dto.ExchangeApiResponseDto;
 import com.doha.practice.dto.ExchangeDto;
 import com.doha.practice.properties.ExchangeRateApiProperties;
+import com.doha.practice.properties.SecurityConfigProperties;
 import com.doha.practice.repository.ExchangeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
