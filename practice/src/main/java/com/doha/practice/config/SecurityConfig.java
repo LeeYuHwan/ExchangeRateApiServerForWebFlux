@@ -1,6 +1,7 @@
 package com.doha.practice.config;
 
 import com.doha.practice.dto.ExchangeErrorDto;
+import com.doha.practice.jwt.JwtProvider;
 import com.doha.practice.properties.SecurityConfigProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,16 +14,20 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
+import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Configuration
 @RequiredArgsConstructor
@@ -31,6 +36,7 @@ import java.time.LocalDateTime;
 public class SecurityConfig {
 
     private final SecurityConfigProperties securityConfigProperties;
+    private final JwtProvider jwtProvider;
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http){
@@ -53,8 +59,8 @@ public class SecurityConfig {
                 .headers()
                 .frameOptions()
                 .mode(XFrameOptionsServerHttpHeadersWriter.Mode.SAMEORIGIN)
-                //.and()
-                //.addFilterBefore(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
+                .and()
+                .addFilterBefore(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
         ;
         return http.build();
     }
@@ -83,6 +89,29 @@ public class SecurityConfig {
                 log.error(e.getMessage(), e);
                 return serverHttpResponse.setComplete();
             }
+        };
+    }
+
+    private AuthenticationWebFilter authenticationWebFilter() {
+        ReactiveAuthenticationManager authenticationManager = Mono::just;
+
+        AuthenticationWebFilter authenticationWebFilter = new AuthenticationWebFilter(authenticationManager);
+        authenticationWebFilter.setServerAuthenticationConverter(serverAuthenticationConverter());
+
+        return authenticationWebFilter;
+    }
+
+    private ServerAuthenticationConverter serverAuthenticationConverter(){
+        return exchange -> {
+            String token = jwtProvider.getToken(exchange.getRequest());
+            try {
+                if(!Objects.isNull(token) && jwtProvider.validateJwtToken(token)){
+                    return Mono.justOrEmpty(jwtProvider.getAuthentication(token));
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+            return Mono.empty();
         };
     }
 

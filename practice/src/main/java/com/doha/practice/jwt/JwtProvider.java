@@ -1,56 +1,100 @@
 package com.doha.practice.jwt;
 
+import com.doha.practice.domain.UserInfo;
 import com.doha.practice.properties.JwtConfigProperties;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
 
+import java.security.Key;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
-public class JwtProvider {
+public class JwtProvider implements InitializingBean {
 
     private final JwtConfigProperties jwtConfigProperties;
 
-    public String createToken(String loginId) {
+    private Key key;
+
+    @Override
+    public void afterPropertiesSet() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtConfigProperties.getSecretKey());
+        this.key = Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String createToken(String userName) {
         Claims claims = Jwts.claims();
-        claims.put("loginId", loginId);
+        claims.put("userName", userName);
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + (10000 * 60 * jwtConfigProperties.getExpireMinute())))
-                .signWith(SignatureAlgorithm.HS256, jwtConfigProperties.getSecretKey())
+                .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
-    public static String getLoginId(String token, String secretKey) {
+    public String getToken(ServerHttpRequest request){
+        return request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+    }
+
+    public String getLoginId(String token, String secretKey) {
         return extractClaims(token, secretKey).get("loginId").toString();
     }
 
-    public static boolean isExpired(String token, String secretKey) {
-        Date expiredDate = extractClaims(token, secretKey).getExpiration();
-        return expiredDate.before(new Date());
+    private Claims parseClaims(String accessToken){
+        try {
+            return Jwts.parserBuilder().setSigningKey(jwtConfigProperties.getSecretKey()).build().parseClaimsJws(accessToken).getBody();
+        } catch(ExpiredJwtException e) {
+            return e.getClaims();
+        }
     }
-
     // SecretKey를 사용해 Token Parsing
-    private static Claims extractClaims(String token, String secretKey) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+    private Claims extractClaims(String token, String secretKey) {
+        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
     }
 
     public boolean validateJwtToken(String authToken) throws JwtException {
         try {
-            Jws<Claims> claims = Jwts
-                    .parserBuilder().setSigningKey(jwtConfigProperties.getSecretKey()).build()
-                    .parseClaimsJws(authToken);
-
-            log.info("expiration date: {}", claims.getBody().getExpiration());
+            Jwts.parserBuilder().setSigningKey(jwtConfigProperties.getSecretKey()).build().parseClaimsJws(authToken);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            log.info("Invalid JWT token: {}", e.getMessage());
-            log.trace("Invalid JWT token trace.", e);
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+            log.error("INVALID JWT SIGNATURE.");
+        } catch (ExpiredJwtException e) {
+            log.error("EXPIRED JWT TOKEN.");
+        } catch (UnsupportedJwtException e) {
+            log.error("UNSUPPORTED JWT TOKEN.");
+        } catch (IllegalArgumentException e) {
+            log.error("JWT TOKEN IS INVALID.");
         }
         return false;
     }
+
+    public Authentication getAuthentication(String accessToken) {
+        Claims claims = parseClaims(accessToken);
+
+        Collection<? extends GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+
+        UserInfo user = UserInfo.builder()
+                .userName(claims.get("userName").toString())
+                .build();
+
+        return new UsernamePasswordAuthenticationToken(user, "", authorities);
+    }
+
 }

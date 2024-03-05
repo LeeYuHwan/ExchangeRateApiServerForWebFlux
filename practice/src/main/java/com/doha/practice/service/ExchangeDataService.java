@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service("exchange.data.v1")
+@Service("v1.exchange.data")
 public class ExchangeDataService implements ApiService {
 
     private final ExchangeRepository exchangeRepository;
@@ -29,12 +29,6 @@ public class ExchangeDataService implements ApiService {
     private Mono<ExchangeRate> getLatestExchangeRate() {
         return exchangeRepository.findFirstByOrderByCreateTimeDesc()
                 .switchIfEmpty(Mono.error((new DataException(9999, "DATA NOT EXIST"))));
-    }
-    private ExchangeErrorDto setExchangeErrorDto(int resultCode, String resultMsg) {
-        return ExchangeErrorDto.builder()
-                .resultCode(resultCode)
-                .resultMsg(resultMsg)
-                .build();
     }
 
 }

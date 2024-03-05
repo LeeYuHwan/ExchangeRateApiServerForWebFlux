@@ -15,11 +15,11 @@ exchange:
     api: /v6/latest
 
 security:
-  no-auth-list: /api/v1/exchange/data
+  no-auth-list: /api/v1/exchange/data, 
+                /api/v1/jwt/token
 
 jwt:
   expire-minute: 60
-  secret-key: doha123
-  password: 12345
+  secret-key: doha123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 
 

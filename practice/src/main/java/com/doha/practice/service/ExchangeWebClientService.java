@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service("exchange.web-client.v1")
+@Service("v1.exchange.web-client")
 public class ExchangeWebClientService implements ApiService {
 
     private final ExchangeWebClient exchangeWebClient;

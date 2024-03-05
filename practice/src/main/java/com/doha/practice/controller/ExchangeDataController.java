@@ -18,12 +18,12 @@ public class ExchangeDataController {
 
     @GetMapping("/web-client")
     public Mono<?> createExchangeRate(){
-        return apiServiceProvider.executeApi("exchange.web-client.v1", null);
+        return apiServiceProvider.executeApi("v1.exchange.web-client", null);
     }
 
     @GetMapping("/data")
     public Mono<?> getDataExchangeRate(){
-        return apiServiceProvider.executeApi("exchange.data.v1", null);
+        return apiServiceProvider.executeApi("v1.exchange.data", null);
     }
 
 }
