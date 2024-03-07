@@ -53,7 +53,7 @@ Response Parameter
 
 ---------------------
 
-+ 환율 OpenApi 호출 후 DB에 저장 : /api/v1/exchange/data - GET
++ 환율 정보 출력 : /api/v1/exchange/data - GET
 
 -----------
 
