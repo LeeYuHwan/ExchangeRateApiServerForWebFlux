@@ -14,7 +14,7 @@
 
 Headers
 
-1. application/json
+1. Content-Type - application/json
 ------------
 
 Request Parameter
@@ -38,7 +38,7 @@ Response Parameter
 + 환율 OpenApi 호출 후 DB에 저장 : /api/v1/exchange/web-client - GET
 
 Headers
-1. AUTHORIZATION - JWT Token check header   
+1. AUTHORIZATION - (JWT Token)   
 -----------
 
 Response Parameter
